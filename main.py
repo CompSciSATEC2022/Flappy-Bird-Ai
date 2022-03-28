@@ -1,4 +1,7 @@
+from bird import Bird
+
 import pygame
+# import neat
 import os
 
 # Set up global vairables
@@ -23,9 +26,13 @@ BIRD_IMAGES = [pygame.transform.scale2x (pygame.image.load (os.path.join ("imgs"
 #   This will handle all the 
 #     drawing on the screen
 # ----------------------------
-def draw_window (window):
-    # Fill the background with black
-    window.fill ( (0, 0, 0) )
+def draw_window (window, birds):
+    # Fill the background with white
+    window.fill ( (255, 255, 255) )
+
+    # Draw the birds
+    for bird in birds:
+        bird.draw (window)
 
     # Update the screen
     pygame.display.update ()
@@ -42,6 +49,14 @@ def main ():
 
     # Make a clock to control FPS
     clock = pygame.time.Clock ()
+
+    # Bird list
+    birds = []
+    birds.append (Bird ( 
+        (WIN_SIZE[0] // 2), 
+        (WIN_SIZE[1] // 2), 
+        BIRD_IMAGES 
+    ))
     
 
     # Main game loop
@@ -57,6 +72,9 @@ def main ():
             # If the X button was pressed exit
             if (event.type == pygame.QUIT):
                 run = False
+        
+        # Update the screen
+        draw_window (WIN, birds)
 
 
 # If this is the main file that is being run then
