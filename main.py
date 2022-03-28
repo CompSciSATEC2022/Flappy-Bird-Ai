@@ -5,7 +5,7 @@ import pygame
 import os
 
 # Set up global vairables
-WIN_SIZE = (1000, 500) # The size of the game window
+WIN_SIZE = (600, 800) # The size of the game window
 WIN = pygame.display.set_mode(WIN_SIZE) # The pygame window itself
 FPS = 60 # Set the FPS the game will run at
 
