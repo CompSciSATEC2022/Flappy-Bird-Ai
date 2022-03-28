@@ -26,13 +26,21 @@ BIRD_IMAGES = [pygame.transform.scale2x (pygame.image.load (os.path.join ("imgs"
 #   This will handle all the 
 #     drawing on the screen
 # ----------------------------
-def draw_window (window, birds):
+def draw_window (window: pygame.surface.Surface, birds: list) -> None:
+    """
+    :param window: The window to draw on.
+    :param birds: The birds to draw.
+    :return: None.
+    """
+
     # Fill the background with white
     window.fill ( (255, 255, 255) )
 
     # Draw the birds
     for bird in birds:
-        bird.draw (window)
+        result = bird.draw (window)
+        if not result:
+            print ("[ERROR] Failed to draw bird")
 
     # Update the screen
     pygame.display.update ()
@@ -45,13 +53,15 @@ def draw_window (window, birds):
 #   This will handle all
 #        game logic
 # ------------------------
-def main ():
+def main () -> None:
 
     # Make a clock to control FPS
     clock = pygame.time.Clock ()
 
-    # Bird list
+    # Make the bird list
     birds = []
+
+    # Add the birds to the bird list
     birds.append (Bird ( 
         (WIN_SIZE[0] // 2), 
         (WIN_SIZE[1] // 2), 
