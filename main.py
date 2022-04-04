@@ -1,7 +1,7 @@
 from bird import Bird
 
 import pygame
-# import neat
+import neat
 import os
 
 # Set up global vairables
@@ -38,9 +38,7 @@ def draw_window (window: pygame.surface.Surface, birds: list) -> None:
 
     # Draw the birds
     for bird in birds:
-        result = bird.draw (window)
-        if not result:
-            print ("[ERROR] Failed to draw bird")
+        bird.draw (window)
 
     # Update the screen
     pygame.display.update ()
