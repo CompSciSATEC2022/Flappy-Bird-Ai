@@ -9,7 +9,13 @@ class Pipe:
     VELOCITY = 5
     GAP = 200
 
-    def __init__ (self, image, x):
+    def __init__ (self, image: pygame.Surface, x):
+        """
+        :parm image: The image to use for the pipe.
+        :param x: The x position of the pipe.
+        :return: None.
+        """
+
         self.x = x
         self.height = 0
 
@@ -29,6 +35,9 @@ class Pipe:
 
 
     def set_height (self):
+        """
+        Set the height of the pipes.
+        """
         
         # Get a random height for 
         # the pipes space to be
@@ -42,10 +51,16 @@ class Pipe:
     
 
     def move (self):
+        """
+        Move the pipes by the velocity.
+        """
         self.x -= self.VELOCITY
 
 
     def draw (self, window: pygame.Surface):
+        """
+        :parm window: The window to draw on.
+        """
         # Draw the top pipe
         window.blit (
             self.PIPE_TOP, 
@@ -60,4 +75,8 @@ class Pipe:
     
 
     def collide (self, bird: Bird, window: pygame.Surface):
+        """
+        :parm bird: The bird to check for collision against.
+        :parm window: The window to relate to.
+        """
         pass
