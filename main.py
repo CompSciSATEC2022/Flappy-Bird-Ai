@@ -1,8 +1,10 @@
+from ground import Ground
 from bird import Bird
 
 import pygame
 import neat
 import os
+
 
 # Set up global vairables
 WIN_SIZE = (600, 800) # The size of the game window
@@ -26,15 +28,19 @@ BIRD_IMAGES = [pygame.transform.scale2x (pygame.image.load (os.path.join ("imgs"
 #   This will handle all the 
 #     drawing on the screen
 # ----------------------------
-def draw_window (window: pygame.surface.Surface, birds: list) -> None:
+def draw_window (window: pygame.surface.Surface, birds: list, base: Ground) -> None:
     """
     :param window: The window to draw on.
     :param birds: The birds to draw.
+    :param base: The base to draw.
     :return: None.
     """
 
     # Fill the background with white
     window.fill ( (255, 255, 255) )
+
+    # Draw the base
+    base.draw (window)
 
     # Draw the birds
     for bird in birds:
@@ -65,6 +71,14 @@ def main () -> None:
         (WIN_SIZE[1] // 2), 
         BIRD_IMAGES 
     ))
+
+    # Make the base
+    base = Ground (
+        NON_BIRD_IMGS[1], 
+
+        0, 
+        (WIN_SIZE[1] - NON_BIRD_IMGS[1].get_height ())
+    )
     
 
     # Main game loop
@@ -81,8 +95,9 @@ def main () -> None:
             if (event.type == pygame.QUIT):
                 run = False
         
+        
         # Update the screen
-        draw_window (WIN, birds)
+        draw_window (WIN, birds, base)
 
 
 # If this is the main file that is being run then
