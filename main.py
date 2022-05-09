@@ -7,7 +7,7 @@ from bird import Bird
 
 # Set up global vairables
 WIN_SIZE = (600, 800) # The size of the game window
-WIN = pygame.display.set_mode(WIN_SIZE) # The pygame window itself
+WIN = pygame.display.set_mode (WIN_SIZE) # The pygame window itself
 FPS = 30 # Set the FPS the game will run at
 
 if (__name__ == "__main__"):
@@ -20,6 +20,11 @@ NON_BIRD_IMGS = [
     pygame.image.load (os.path.join (os.getcwd (), "imgs", "base.png" )), # A base section
     pygame.image.load (os.path.join (os.getcwd (), "imgs", "bg.png"   ))  # Background
 ]
+
+NON_BIRD_IMGS[2] = pygame.transform.scale (
+    NON_BIRD_IMGS[2].convert_alpha(), 
+    WIN_SIZE
+)
 
 BIRD_IMAGES = [pygame.transform.scale2x (pygame.image.load (os.path.join ("imgs", "bird" + str (number) + ".png"))) for number in range (1, 4)]
 
@@ -44,6 +49,7 @@ def draw_window (window: pygame.surface.Surface, birds: list, base: Ground, pipe
 
     # Fill the background with white
     window.fill ( (255, 255, 255) )
+    window.blit(NON_BIRD_IMGS[2], (0, 0))
 
     # Draw the pipes
     for pipe in pipes:
