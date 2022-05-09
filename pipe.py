@@ -1,4 +1,4 @@
-from main import WIN_SIZE 
+from main import WIN_SIZE, NON_BIRD_IMGS
 from bird import Bird
 
 import random
@@ -42,7 +42,10 @@ class Pipe:
         
         # Get a random height for 
         # the pipes space to be
-        self.height = random.randrange (50, WIN_SIZE[1] - 50)
+        self.height = random.randrange (
+            50, 
+            (WIN_SIZE[1] - NON_BIRD_IMGS[1].get_height ()) - (self.GAP + 50)
+        )
 
         # Top pipe y position
         self.top = self.height - self.PIPE_TOP.get_height ()

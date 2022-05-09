@@ -8,7 +8,7 @@ from bird import Bird
 # Set up global vairables
 WIN_SIZE = (600, 800) # The size of the game window
 WIN = pygame.display.set_mode (WIN_SIZE) # The pygame window itself
-FPS = 30 # Set the FPS the game will run at
+FPS = 20 # Set the FPS the game will run at
 
 if (__name__ == "__main__"):
     from pipe import Pipe
@@ -142,6 +142,7 @@ def main () -> None:
                 if (pipe.collide (bird)):
                     # Remove the bird
                     birds.pop (pos)
+                    print ("Bird removed")
             
             # If the pipe is off the screen
             if (pipe.x + pipe.PIPE_TOP.get_width () < 0):
@@ -166,10 +167,26 @@ def main () -> None:
                 )
             )
         
+
         # Remove the pipes that are off the screen
         for pipe in remove:
             pipes.remove (pipe)
+
+
+        # Move the bird
+        remove = []
+        for bird in birds:
+            if (bird.y >= (WIN_SIZE[1] - NON_BIRD_IMGS[1].get_height ())):
+                remove.append (bird)
+
+            else:
+                bird.move ()
         
+        # Remove the birds that are off the screen
+        for bird in remove:
+            birds.remove (bird)
+            print ("Bird removed")
+
 
         # Update the screen
         draw_window (WIN, birds, base, pipes)
