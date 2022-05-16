@@ -65,7 +65,10 @@ class Bird:
         if displacement < 0:
             displacement -= 2
 
-        self.y = self.y + displacement
+        self.y = self.y + displacement # (displacement / (4/3))
+        
+        if self.y < 0:
+            self.y = 0
 
         # Tilt the bird up
         if displacement < 0 or self.y < self.height + 50:
@@ -100,7 +103,7 @@ class Bird:
         elif self.img_count <= self.ANIMATION_TIME * 4:
             self.image = self.images[1]
 
-        elif self.img_count <= self.ANIMATION_TIME * 4 + 1:
+        elif self.img_count <= (self.ANIMATION_TIME * 4) + 1:
             self.image = self.images[0]
             self.img_count = 0
 

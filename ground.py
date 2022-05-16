@@ -3,7 +3,7 @@ import pygame
 
 class Ground:
 
-    VElOCITY = 5
+    VELOCITY = 5
 
     def __init__ (self, image: pygame.Surface, x: int, y: int):
         """

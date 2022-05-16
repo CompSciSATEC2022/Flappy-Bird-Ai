@@ -8,7 +8,8 @@ from bird import Bird
 # Set up global vairables
 WIN_SIZE = (600, 800) # The size of the game window
 WIN = pygame.display.set_mode (WIN_SIZE) # The pygame window itself
-FPS = 20 # Set the FPS the game will run at
+FPS = 30 # Set the FPS the game will run at
+gen = 0
 
 if (__name__ == "__main__"):
     from pipe import Pipe
@@ -73,20 +74,28 @@ def draw_window (window: pygame.surface.Surface, birds: list, base: Ground, pipe
 #   This will handle all
 #        game logic
 # ------------------------
-def main () -> None:
+def main (genomes_in, config) -> None:
+    global gen
+    gen += 1
 
     # Make a clock to control FPS
     clock = pygame.time.Clock ()
 
     # Make the bird list
-    birds = []
-
     # Add the birds to the bird list
-    birds.append (Bird ( 
-        (WIN_SIZE[0] // 2), 
-        (WIN_SIZE[1] // 2), 
-        BIRD_IMAGES 
-    ))
+    birds = []
+    nets = []
+    genomes = []
+    for _, genome in genomes_in:
+        genome.fitness = 0
+        
+        net = neat.nn.FeedForwardNetwork.create (genome, config)
+        nets.append (net)
+
+        birds.append (Bird (230, 350, BIRD_IMAGES))
+        genomes.append (genome)
+    
+        
 
     # Make the base
     base = Ground (
@@ -109,7 +118,9 @@ def main () -> None:
     
     # Main game loop
     run = True
-    while (run):
+    while (run and len (birds) > 0):
+        if len(birds) == 0:
+            print ("End")
 
         # Control fps
         clock.tick (FPS)
@@ -120,7 +131,10 @@ def main () -> None:
             # If the X button was pressed exit
             if (event.type == pygame.QUIT):
                 run = False
+                pygame.quit ()
+                quit ()
             
+            """
             # If the user pressed a key
             if (event.type == pygame.KEYDOWN):
                 # If the user pressed the space bar
@@ -128,36 +142,71 @@ def main () -> None:
                     # Make the bird jump
                     for bird in birds:
                         bird.jump ()
+            """
         
+        pipe_ind = 0
+        if len (birds) > 0:
+            if len (pipes) > 1:
+                if birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width ():
+                    pipe_ind = 1
+        
+        for x, bird in enumerate (birds):
+            genomes[x].fitness += 0.1
+            bird.move ()
+
+            output = nets[birds.index(bird)].activate (
+                (
+                    bird.y,
+                    abs (bird.y - pipes[pipe_ind].height),
+                    abs (bird.y - pipes[pipe_ind].bottom)
+                )
+            )
+
+            if (output[0] > .5):
+                bird.jump ()
+        
+        base.move ()
+
 
         remove = []
         add_pipe = False
         for pipe in pipes:
-            # Move the pipe
-            pipe.move ()
-
             # Check for collisions
-            for pos, bird in enumerate (birds):
+            bird = birds[0]
+            for bird in birds:
                 # If the bird collides with the pipe
                 if (pipe.collide (bird)):
-                    # Remove the bird
-                    birds.pop (pos)
-                    print ("Bird removed")
-            
+                    genomes[birds.index(bird)].fitness -= 1
+                    nets.pop (birds.index(bird))
+                    genomes.pop (birds.index(bird))
+                    birds.pop (birds.index(bird))
+
+                bird = bird
+
+
             # If the pipe is off the screen
             if (pipe.x + pipe.PIPE_TOP.get_width () < 0):
                 # Remove the pipe
                 remove.append (pipe)
             
+
             # If the pipe has not been marked as
             # passed then do so
             if (not pipe.passed and pipe.x < bird.x):
                 pipe.passed = True
                 add_pipe = True
+
+            # Move the pipe
+            pipe.move ()
+
         
         # If a pipe was passed
         if (add_pipe):
             score += 1
+
+            for genome in genomes:
+                genome.fitness += 5
+
 
             # Add a new pipe
             pipes.append (
@@ -176,22 +225,42 @@ def main () -> None:
         # Move the bird
         remove = []
         for bird in birds:
-            if (bird.y >= (WIN_SIZE[1] - NON_BIRD_IMGS[1].get_height ())):
+            if (bird.y + bird.image.get_height() >= (WIN_SIZE[1] - NON_BIRD_IMGS[1].get_height ())):
                 remove.append (bird)
 
-            else:
-                bird.move ()
-        
-        # Remove the birds that are off the screen
-        for bird in remove:
-            birds.remove (bird)
-            print ("Bird removed")
+            elif bird.y < -50:
+                nets.pop(birds.index(bird))
+                genomes.pop(birds.index(bird))
+                birds.pop(birds.index(bird))
 
 
         # Update the screen
         draw_window (WIN, birds, base, pipes)
 
 
+
+def run ():
+    config_file = os.path.join (os.getcwd (), "config-feedforward.txt")
+    config = neat.config.Config (
+        neat.DefaultGenome,
+        neat.DefaultReproduction,
+        neat.DefaultSpeciesSet,
+        neat.DefaultStagnation,
+        config_file
+    )
+
+    population = neat.Population (config)
+
+    population.add_reporter (neat.StdOutReporter (True))
+    stats = neat.StatisticsReporter ()
+    population.add_reporter (stats)
+
+    # Run for 50 gens
+    best = population.run (main, 50)
+
+    print (f"\nBest ai: \n{best}")
+
+
 # If this is the main file that is being run then
 if (__name__ == "__main__"):
-    main ()
+    run ()
