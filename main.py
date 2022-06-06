@@ -1,4 +1,5 @@
 import pygame
+import pickle
 import neat
 import os
 
@@ -191,16 +192,17 @@ def main (genomes_in, config) -> None:
         add_pipe = False
         for pipe in pipes:
             # Check for collisions
-            bird = birds[0]
-            for bird in birds:
-                # If the bird collides with the pipe
-                if (pipe.collide (bird)):
-                    genomes[birds.index(bird)].fitness -= 1
-                    nets.pop (birds.index(bird))
-                    genomes.pop (birds.index(bird))
-                    birds.pop (birds.index(bird))
+            if len (birds) > 0:
+                bird = birds[0]
+                for bird in birds:
+                    # If the bird collides with the pipe
+                    if (pipe.collide (bird)):
+                        genomes[birds.index(bird)].fitness -= 1
+                        nets.pop (birds.index(bird))
+                        genomes.pop (birds.index(bird))
+                        birds.pop (birds.index(bird))
 
-                bird = bird
+                    bird = bird
 
 
             # If the pipe is off the screen
@@ -211,9 +213,10 @@ def main (genomes_in, config) -> None:
 
             # If the pipe has not been marked as
             # passed then do so
-            if (not pipe.passed and pipe.x < bird.x):
-                pipe.passed = True
-                add_pipe = True
+            if len (birds) > 0:
+                if (not pipe.passed and pipe.x < bird.x):
+                    pipe.passed = True
+                    add_pipe = True
 
             # Move the pipe
             pipe.move ()
@@ -280,11 +283,33 @@ def run ():
     population.add_reporter (stats)
 
     # Run for 50 gens
-    best = population.run (main, 50)
+    best = population.run (main, 25)
 
     print (f"\nBest ai: \n{best}")
+
+    pickle.dump (best, open ("best.pickle", "wb"))
+
+
+def play_old ():
+    config_file = os.path.join (os.getcwd (), "config-feedforward.txt")
+    config = neat.config.Config (
+        neat.DefaultGenome,
+        neat.DefaultReproduction,
+        neat.DefaultSpeciesSet,
+        neat.DefaultStagnation, 
+        config_file
+    )
+    best = pickle.load (open ("best.pickle", "rb"))
+    
+    genomes = [(1, best)]
+
+    main (genomes, config)
+    
 
 
 # If this is the main file that is being run then
 if (__name__ == "__main__"):
-    run ()
+    if (False):
+        play_old ()
+    else:
+        run ()
