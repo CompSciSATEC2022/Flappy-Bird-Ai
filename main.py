@@ -62,6 +62,25 @@ def draw_window (window: pygame.surface.Surface, birds: list, base: Ground, pipe
     # Draw the birds
     for bird in birds:
         bird.draw (window)
+    
+    for bird in birds:
+        for pipe in pipes:
+            if pipe.passed == False:
+                pygame.draw.line (
+                    window, 
+                    (255, 0, 0),
+                    (bird.x, bird.y),
+                    (pipe.x + (pipe.PIPE_TOP.get_width () // 2), pipe.height),
+                    width=3
+                )
+                pygame.draw.line (
+                    window, 
+                    (255, 0, 0),
+                    (bird.x, bird.y),
+                    (pipe.x + (pipe.PIPE_TOP.get_width () // 2), pipe.bottom),
+                    width=3
+                )
+                break
 
     # Update the screen
     pygame.display.update ()
@@ -118,8 +137,8 @@ def main (genomes_in, config) -> None:
     
     # Main game loop
     run = True
-    while (run and len (birds) > 0):
-        if len(birds) == 0:
+    while (run and len (birds) != 0):
+        if len (birds) == 0:
             print ("End")
 
         # Control fps
@@ -232,6 +251,11 @@ def main (genomes_in, config) -> None:
                 nets.pop(birds.index(bird))
                 genomes.pop(birds.index(bird))
                 birds.pop(birds.index(bird))
+        
+        for bird in remove:
+            nets.pop(birds.index(bird))
+            genomes.pop(birds.index(bird))
+            birds.pop(birds.index(bird))
 
 
         # Update the screen
